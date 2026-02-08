@@ -8,7 +8,7 @@ st.set_page_config(page_title="Bussola della Motivazione", layout="centered")
 # --- HEADER: LOGO E TITOLO ---
 # Nota: Il file "GENERA Logo Colore.png" deve essere nella stessa cartella del file .py
 st.image("GENERA Logo Colore.png", width=300)
-st.title("🧭 La Tua Bussola della Motivazione")
+st.title("La Tua Bussola della Motivazione")
 
 # --- INTRODUZIONE ---
 st.markdown("""
