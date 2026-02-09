@@ -23,7 +23,7 @@ Un buon leader deve saper orchestrare queste leve che hanno pesi differenti per 
 """)
 
 # --- SEZIONE SOCIO-ANAGRAFICA ---
-st.subheader("📋 Informazioni Generali")
+st.subheader("Informazioni Generali")
 with st.expander("Inserisci i tuoi dati", expanded=True):
     nome = st.text_input("Nome o Nickname")
     genere = st.selectbox("Genere", ["maschile", "femminile", "non binario", "non risponde"])
@@ -32,7 +32,7 @@ with st.expander("Inserisci i tuoi dati", expanded=True):
     ruolo = st.selectbox("Ruolo professionale", ["imprenditore", "top manager", "middle manager", "impiegato", "operaio", "tirocinante", "libero professionista"])
 
 # --- QUESTIONARIO (14 ITEM) ---
-st.subheader("🧠 Questionario di Autovalutazione")
+st.subheader("Questionario di Autovalutazione")
 st.info("Rispondi onestamente pensando a come agisci con i tuoi collaboratori (Scala 1-5)")
 
 # Definizione item e fattori
