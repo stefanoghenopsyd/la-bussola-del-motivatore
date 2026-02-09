@@ -37,16 +37,16 @@ st.info("Rispondi onestamente pensando a come agisci con i tuoi collaboratori (S
 
 # Definizione item e fattori
 items = [
-    ("Sono capace di essere equo nel premiare e sanzionare (1/2)", "Estrinseci"),
-    ("Richiamo esplicitamente i miei collaboratori alle conseguenze delle loro azioni in termini di sanzioni e di premi (2/2)", "Estrinseci"),
-    ("Mi impegno a fondo nell'esplicitare le responsabilità ai miei collaboratori (1/2)", "Estrinseci/Intrinseci"),
-    ("Mi impegno a fondo sviluppare le competenze dei miei collaboratori (2/2)", "Estrinseci/Intrinseci"),
+    ("Mi impegno a fondo nel premiare e sanzionare equamente i miei collaboratori (1/2)", "Estrinseci"),
+    ("Mi impegno a fondo nell'esplicitare ai miei collaboratori le conseguenze positive e negative delle loro azioni (2/2)", "Estrinseci"),
+    ("Mi impegno a fondo nell'esplicitare ai miei collaboratori le responsabilità che hanno (1/2)", "Estrinseci/Intrinseci"),
+    ("Mi impegno a fondo far crescere e potenziare le competenze dei miei collaboratori (2/2)", "Estrinseci/Intrinseci"),
     ("Richiamo esplicitamente i miei collaboratori alle regole e ai valori da rispettare nel lavoro (1/2)", "Intrinseci"),
     ("Richiamo esplicitamente i miei collaboratori al senso del dovere (2/2)", "Intrinseci"),
     ("Mi impegno a fondo nel riconoscere le attitudini dei miei collaboratori e nel valorizzarne i talenti (1/2)", "Intrinseci"),
-    ("Mi impegno a fondo nello stimolare l'interesse dei miei collaboratori verso il lavoro (2/2)", "Intrinseci"),
+    ("Mi impegno a fondo nello stimolare l'interesse dei miei collaboratori verso il contenuto del lavoro (2/2)", "Intrinseci"),
     ("Richiamo esplicitamente il valore dell'appartenenza al gruppo (1/2)", "Intrinseci/Clima"),
-    ("Mi impegno a fondo nel promuovere il senso di comunità (2/2)", "Intrinseci/Clima"),
+    ("Mi impegno a fondo nel promuovere il senso di comunità (collaborazione e solidarietà pratica) (2/2)", "Intrinseci/Clima"),
     ("Mi impegno a fondo nel curare le relazioni interpersonali (1/2)", "Clima"),
     ("Mi impegno a fondo nella gestione costruttiva dei conflitti (2/2)", "Clima"),
     ("Mi impegno a fondo nel fornire informazioni chiare e corrette (1/2)", "Clima/Estrinseci"),
