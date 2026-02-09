@@ -37,20 +37,20 @@ st.info("Rispondi onestamente pensando a come agisci con i tuoi collaboratori (S
 
 # Definizione item e fattori
 items = [
-    ("Equità nel premiare e sanzionare (1/2)", "Estrinseci"),
-    ("Chiarezza circa le sanzioni e i premi (2/2)", "Estrinseci"),
-    ("Responsabilizzazione dei collaboratori (1/2)", "Estrinseci/Intrinseci"),
-    ("Investimento nella formazione e competenza (2/2)", "Estrinseci/Intrinseci"),
-    ("Chiarezza circa le regole e i valori (1/2)", "Intrinseci"),
-    ("Promozione del senso del dovere (2/2)", "Intrinseci"),
-    ("Cura del talento e attitudini (1/2)", "Intrinseci"),
-    ("Stimolo dell'interesse verso il lavoro (2/2)", "Intrinseci"),
-    ("Cura dell'appartenenza al gruppo (1/2)", "Intrinseci/Clima"),
-    ("Promozione del senso di comunità (2/2)", "Intrinseci/Clima"),
-    ("Cura delle relazioni interpersonali (1/2)", "Clima"),
-    ("Gestione costruttiva dei conflitti (2/2)", "Clima"),
-    ("Qualità dell'informazione fornita (1/2)", "Clima/Estrinseci"),
-    ("Trasparenza e quantità dei dati condivisi (2/2)", "Clima/Estrinseci")
+    ("Sono capace di essere equo nel premiare e sanzionare (1/2)", "Estrinseci"),
+    ("Richiamo esplicitamente i miei collaboratori alle conseguenze delle loro azioni in termini di sanzioni e di premi (2/2)", "Estrinseci"),
+    ("Mi impegno a fondo nell'esplicitare le responsabilità ai miei collaboratori (1/2)", "Estrinseci/Intrinseci"),
+    ("Mi impegno a fondo sviluppare le competenze dei miei collaboratori (2/2)", "Estrinseci/Intrinseci"),
+    ("Richiamo esplicitamente i miei collaboratori alle regole e ai valori da rispettare nel lavoro (1/2)", "Intrinseci"),
+    ("Richiamo esplicitamente i miei collaboratori al senso del dovere (2/2)", "Intrinseci"),
+    ("Mi impegno a fondo nel riconoscere le attitudini dei miei collaboratori e nel valorizzarne i talenti (1/2)", "Intrinseci"),
+    ("Mi impegno a fondo nello stimolare l'interesse dei miei collaboratori verso il lavoro (2/2)", "Intrinseci"),
+    ("Richiamo esplicitamente il valore dell'appartenenza al gruppo (1/2)", "Intrinseci/Clima"),
+    ("Mi impegno a fondo nel promuovere il senso di comunità (2/2)", "Intrinseci/Clima"),
+    ("Mi impegno a fondo nel curare le relazioni interpersonali (1/2)", "Clima"),
+    ("Mi impegno a fondo nella gestione costruttiva dei conflitti (2/2)", "Clima"),
+    ("Mi impegno a fondo nel fornire informazioni chiare e corrette (1/2)", "Clima/Estrinseci"),
+    ("Sono attento a garantire trasparenza e accesso ai dati condivisi (2/2)", "Clima/Estrinseci")
 ]
 
 responses = []
