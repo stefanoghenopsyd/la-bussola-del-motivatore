@@ -1,139 +1,112 @@
 import streamlit as st
 import pandas as pd
-import plotly.graph_objects as go
-import os
+import numpy as np
+import matplotlib.pyplot as plt
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import random
 
-# --- CONFIGURAZIONE PAGINA ---
-st.set_page_config(page_title="Bussola della Motivazione", layout="centered")
+# --- 1. CONFIGURAZIONE E TESTI ---
+st.set_page_config(page_title="Bussola Motivazionale - GENERA", layout="centered")
 
-# --- HEADER: LOGO E TITOLO (Con gestione errore percorso) ---
-try:
-    # Cerca l'immagine nella stessa cartella dello script
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    logo_path = os.path.join(current_dir, "GENERA Logo Colore.png")
-    st.image(logo_path, width=300)
-except:
-    # Se non trova l'immagine, mostra solo il testo (evita il crash)
-    st.markdown("## GENERA")
+FACTORS = {
+    "Premi e Punizioni": "Estrinseco",
+    "Responsabilità e Competenza": "Ibrido Intr/Est",
+    "Interesse e Senso del Dovere": "Intrinseco",
+    "Appartenenza e Comunità": "Ibrido Intr/Clima",
+    "Qualità delle Relazioni": "Clima",
+    "Informazioni Disponibili": "Ibrido Clima/Est",
+    "Talenti e Attitudini": "Intrinseco"
+}
 
-st.title("La Tua Bussola della Motivazione")
+# Definizione dei 14 items basati sui punti di attenzione
+QUESTIONS = [
+    {"id": "q1", "text": "Mi assicuro che premi e sanzioni siano distribuiti con equità tra i collaboratori.", "factor": "Premi e Punizioni"},
+    {"id": "q2", "text": "Valuto con oggettività le prestazioni prima di assegnare incentivi.", "factor": "Premi e Punizioni"},
+    {"id": "q3", "text": "Offro ai miei collaboratori compiti che ne accrescano la responsabilità.", "factor": "Responsabilità e Competenza"},
+    {"id": "q4", "text": "Incentivo percorsi di formazione per sviluppare nuove competenze nel team.", "factor": "Responsabilità e Competenza"},
+    {"id": "q5", "text": "Condivido costantemente informazioni rilevanti sull'andamento aziendale.", "factor": "Informazioni Disponibili"},
+    {"id": "q6", "text": "Mi accerto che ogni collaboratore abbia i dati necessari per svolgere il suo lavoro.", "factor": "Informazioni Disponibili"},
+    {"id": "q7", "text": "Intervengo attivamente per gestire i conflitti in modo costruttivo.", "factor": "Qualità delle Relazioni"},
+    {"id": "q8", "text": "Dedico tempo a curare le relazioni personali e professionali tra i colleghi.", "factor": "Qualità delle Relazioni"},
+    {"id": "q9", "text": "Promuovo iniziative che rafforzino il senso di appartenenza al gruppo.", "factor": "Appartenenza e Comunità"},
+    {"id": "q10", "text": "Lavoro affinché i valori aziendali siano condivisi e sentiti da tutti.", "factor": "Appartenenza e Comunità"},
+    {"id": "q11", "text": "Assegno i compiti basandomi sui talenti naturali dei miei collaboratori.", "factor": "Talenti e Attitudini"},
+    {"id": "q12", "text": "Cerco di allineare le sfide lavorative alle attitudini individuali.", "factor": "Talenti e Attitudini"},
+    {"id": "q13", "text": "Sottolineo l'importanza del senso del dovere verso l'oggetto del lavoro.", "factor": "Interesse e Senso del Dovere"},
+    {"id": "q14", "text": "Cerco di trasmettere passione e amore per la qualità del lavoro svolto.", "factor": "Interesse e Senso del Dovere"}
+]
 
-# --- INTRODUZIONE ---
+# --- 2. LOGICA DI SALVATAGGIO ---
+def save_to_drive(data):
+    try:
+        # Caricamento credenziali da st.secrets [cite: 20]
+        scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+        creds = ServiceAccountCredentials.from_json_keyfile_dict(st.secrets["gcp_service_account"], scope)
+        client = gspread.authorize(creds)
+        sheet = client.open("Database_Motivazione").sheet1
+        sheet.append_row(data)
+    except Exception as e:
+        st.warning("Nota: I dati non sono stati salvati sul database online, ma il tuo feedback è pronto!")
+
+# --- 3. INTERFACCIA UTENTE ---
+st.image("GENERA Logo Colore.png", width=300) # 
+st.title("La Tua Bussola Motivazionale")
+
 st.markdown("""
-### La Motivazione come Sistema Dinamico
-La motivazione al lavoro non è un elemento statico, ma un **sistema integrato** dove convivono tre macro aree: 
-* **Intrinseci:** la spinta che nasce dentro di noi (piacere e dovere).
-* **Estrinseci:** le leve esterne (premi e regole).
-* **di Clima:** l'ossigeno delle relazioni e della comunità.
-
-Un buon leader deve saper orchestrare queste leve. Questa autovalutazione ti aiuterà a riconoscere la tua **"bussola" personale**.
----
+### Introduzione
+La motivazione al lavoro è un sistema integrato dove convivono tre macroaree: **Fattori Intrinseci, Estrinseci e di Clima**. 
+Sebbene ogni fattore eserciti un'influenza diversa, un buon motivatore deve saper agire su tutte queste leve. 
+Questa autovalutazione ti aiuterà a scoprire la tua **'bussola' personale**, riconoscendo quali leve utilizzi con maggior frequenza.
 """)
 
-# --- SEZIONE SOCIO-ANAGRAFICA ---
-st.subheader("Informazioni Generali")
-with st.expander("Inserisci i tuoi dati", expanded=True):
+with st.form("survey_form"):
+    st.subheader("Informazioni Socio-Anagrafiche")
     nome = st.text_input("Nome o Nickname")
     genere = st.selectbox("Genere", ["maschile", "femminile", "non binario", "non risponde"])
     eta = st.selectbox("Età", ["fino a 20 anni", "21-30 anni", "31-40 anni", "41-50 anni", "51-60 anni", "61-70 anni", "più di 70 anni"])
-    titolo = st.selectbox("Titolo di studio", ["licenza media", "qualifica professionale", "diploma di maturità", "laurea triennale", "laurea magistrale", "titolo post lauream"])
+    studio = st.selectbox("Titolo di studio", ["licenza media", "qualifica professionale", "diploma di maturità", "laurea triennale", "laurea magistrale", "titolo post lauream"])
     ruolo = st.selectbox("Ruolo professionale", ["imprenditore", "top manager", "middle manager", "impiegato", "operaio", "tirocinante", "libero professionista"])
 
-# --- QUESTIONARIO (14 ITEM) ---
-st.subheader("Questionario di Autovalutazione")
-st.info("Rispondi onestamente pensando a come agisci con i tuoi collaboratori (Scala 1-5)")
+    st.subheader("Questionario")
+    st.info("Valuta quanto ti rivedi in queste affermazioni (1 = Per nulla, 6 = Completamente)")
+    
+    # Shuffle delle domande
+    if 'shuffled_questions' not in st.session_state:
+        st.session_state.shuffled_questions = random.sample(QUESTIONS, len(QUESTIONS))
+    
+    responses = {}
+    for q in st.session_state.shuffled_questions:
+        responses[q['id']] = st.slider(q['text'], 1, 6, 3)
 
-# Lista corretta degli Items
-items = [
-    # 0, 1: Estrinseci Puri
-    ("Mi impegno a fondo nel premiare e sanzionare equamente i miei collaboratori", "Estrinseci"),
-    ("Esplicito ai miei collaboratori le conseguenze positive e negative delle loro azioni", "Estrinseci"),
-    
-    # 2, 3: Ponte Estrinseci/Intrinseci (Responsabilità)
-    ("Esplicito ai miei collaboratori le responsabilità che hanno", "Estrinseci/Intrinseci"),
-    ("Mi impegno a far crescere e potenziare le competenze dei miei collaboratori", "Estrinseci/Intrinseci"),
-    
-    # 4, 5, 6, 7: Intrinseci Puri (Regole/Dovere + Amore/Interesse)
-    ("Richiamo esplicitamente le regole e i valori da rispettare", "Intrinseci"),
-    ("Richiamo esplicitamente i miei collaboratori al senso del dovere", "Intrinseci"),
-    ("Mi impegno nel riconoscere le attitudini e valorizzare i talenti", "Intrinseci"),
-    ("Stimolo l'interesse dei miei collaboratori verso il contenuto del lavoro", "Intrinseci"),
-    
-    # 8, 9: Ponte Intrinseci/Clima (Appartenenza)
-    ("Richiamo esplicitamente il valore dell'appartenenza al gruppo", "Intrinseci/Clima"),
-    ("Promuovo il senso di comunità, collaborazione e solidarietà", "Intrinseci/Clima"),
-    
-    # 10, 11: Clima Puro (Relazioni)
-    ("Mi impegno a fondo nel curare le relazioni interpersonali", "Clima"),
-    ("Mi impegno nella gestione costruttiva dei conflitti", "Clima"),
-    
-    # 12, 13: Ponte Clima/Estrinseci (Informazioni)
-    ("Fornisco informazioni chiare e corrette", "Clima/Estrinseci"),
-    ("Garantisco trasparenza e accesso ai dati condivisi", "Clima/Estrinseci")
-]
+    submit = st.form_submit_button("Genera Feedback")
 
-responses = []
-# Loop con chiave univoca per evitare errori di Streamlit
-for i, (desc, cat) in enumerate(items):
-    val = st.slider(f"{i+1}. {desc}", 1, 5, 3, key=f"item_{i}")
-    responses.append(val)
-
-# --- LOGICA DI CALCOLO ---
-if st.button("Genera Profilo"):
+if submit:
+    # Calcolo punteggi per fattore
+    scores = {f: 0 for f in FACTORS.keys()}
+    for q in QUESTIONS:
+        scores[q['factor']] += responses[q['id']]
     
-    # LOGICA CORRETTA:
-    # I fattori "ponte" contribuiscono a entrambe le aree adiacenti.
+    # Identificazione orientamento dominante
+    top_factors = sorted(scores.items(), key=lambda x: x[1], reverse=True)[:2]
     
-    # Estrinseci = Puri (0,1) + Ponte Resp (2,3) + Ponte Info (12,13)
-    score_est = (responses[0] + responses[1] + responses[2] + responses[3] + responses[12] + responses[13]) / 6
+    # --- VISUALIZZAZIONE RISULTATI ---
+    st.header("Il Tuo Orientamento")
     
-    # Intrinseci = Puri (4,5,6,7) + Ponte Resp (2,3) + Ponte Appartenenza (8,9)
-    score_int = (responses[4] + responses[5] + responses[6] + responses[7] + responses[2] + responses[3] + responses[8] + responses[9]) / 8
-    
-    # Clima = Puri (10,11) + Ponte Appartenenza (8,9) + Ponte Info (12,13)
-    score_cli = (responses[10] + responses[11] + responses[8] + responses[9] + responses[12] + responses[13]) / 6
+    # Grafico (Esempio Radar/Bussola semplificato)
+    fig, ax = plt.subplots(figsize=(6, 6))
+    categories = list(scores.keys())
+    values = list(scores.values())
+    ax.barh(categories, values, color='#1f77b4') # Usa colori dal logo GENERA se noti
+    st.pyplot(fig)
 
-    # --- GRAFICO A BUSSOLA (Radar) ---
-    categories = ['Estrinseci', 'Intrinseci', 'Clima']
-    scores = [score_est, score_int, score_cli]
+    st.write(f"**Il tuo orientamento prevalente è focalizzato su: {top_factors[0][0]} e {top_factors[1][0]}.**")
+    st.write("Questo indica una propensione a motivare i collaboratori agendo principalmente su leve di tipo " + 
+             f"{FACTORS[top_factors[0][0]]}. Ricorda che un sistema motivazionale efficace integra tutte le dimensioni.")
 
-    fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(
-          r=scores + [scores[0]], # Chiude il cerchio
-          theta=categories + [categories[0]],
-          fill='toself',
-          name='Il tuo Profilo',
-          line_color='#008080' # Verde acqua professionale
-    ))
+    # Preparazione dati per Drive
+    row = [nome, genere, eta, studio, ruolo] + [responses[f"q{i+1}"] for i in range(14)]
+    save_to_drive(row)
 
-    fig.update_layout(
-      polar=dict(radialaxis=dict(visible=True, range=[0, 5])),
-      showlegend=False,
-      title="La tua Bussola Motivazionale"
-    )
-
-    st.plotly_chart(fig)
-
-    # --- FEEDBACK DESCRITTIVO ---
-    st.divider()
-    st.subheader("🔍 Analisi dell'Orientamento")
-    
-    max_val = max(scores)
-    # Calcolo della deviazione per capire se è bilanciato (se la differenza tra max e min è poca)
-    is_balanced = (max(scores) - min(scores)) < 0.5 
-    
-    if is_balanced:
-        title = "L'Equilibratore Sistemico"
-        desc = "Hai un approccio multidimensionale. Riesci a passare con agilità dalla gestione del clima al dovere, senza dimenticare le regole. Il tuo orientamento è dinamico."
-    elif max_val == score_est:
-        title = "Il Garante della Struttura"
-        desc = "Ti affidi alla chiarezza delle regole, all'equità dei premi e alla trasparenza. Sei un punto di riferimento solido, ma ricorda di curare anche l'aspetto emotivo."
-    elif max_val == score_int:
-        title = "L'Ispiratore di Senso"
-        desc = "Punti sulla crescita del singolo, sulla passione e sul senso del dovere. Ti appassiona vedere le persone fiorire, ma attento a non dare per scontata la struttura."
-    else:
-        title = "Il Connettore Relazionale"
-        desc = "Per te il team è una comunità. La tua forza è l'empatia e il clima armonioso. Assicurati però che le 'buone relazioni' non offuschino gli obiettivi e le regole."
-
-    st.success(f"**Profilo Rilevato: {title}**")
-    st.markdown(f"_{desc}_")
+st.markdown("---")
+st.markdown("<center>Powered by GÉNERA</center>", unsafe_allow_html=True)
